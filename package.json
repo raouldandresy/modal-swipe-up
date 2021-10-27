@@ -19,4 +19,13 @@
     "react": "*",
     "react-native": ">=0.46"
   },
+ "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raouldandresy/modal-swipe-up.git"
+  },
+  "bugs": {
+    "url": "https://github.com/raouldandresy/modal-swipe-up/issues"
+  },
+  "homepage": "https://github.com/raouldandresy/modal-swipe-up/blob/main/README.md"
+
 }
