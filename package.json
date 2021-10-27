@@ -1,0 +1,22 @@
+{
+  "name": "modal-swipe-up",
+  "version": "1.0.0",
+  "description": "Modal Full page with transition from top to bottom and swipe up gesture",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Giuseppe Corbisiero",
+  "license": "MIT",
+    "keywords": [
+    "modal",
+    "swipe-up",
+    "react",
+    "react-native",
+    "animation"
+  ],
+    "peerDependencies": {
+    "react": "*",
+    "react-native": ">=0.46"
+  },
+}
