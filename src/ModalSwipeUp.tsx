@@ -9,6 +9,7 @@ interface ModalSwipeUpProps {
     onPressClose?: () => void;
     closeHeight?: number;
     onOpen?: () => void;
+    submitButtonOnPress?: () => void;
 }
 
 interface ModalSwipeUpState {
@@ -41,6 +42,11 @@ export default class ModalSwipeUp extends PureComponent<ModalSwipeUpProps, Modal
         if(prev.showModal && !this.props.showModal){
             this.onPressClose();
         }
+    }
+    
+    onPress=() => {
+        this.setState({animated: new Animated.Value(-1000), opacity: new Animated.Value(1), showModal: false});
+        this.props.submitButtonOnPress && this.props.submitButtonOnPress();
     }
 
     panResponder = PanResponder.create({
@@ -89,7 +95,7 @@ export default class ModalSwipeUp extends PureComponent<ModalSwipeUpProps, Modal
 
     render() { 
         return (
-            <Modal presentationStyle={'fullScreen'} animationType={'none'} visible={this.state.showModal} transparent>
+            <Modal visible={this.state.showModal} transparent>
             <Animated.View style={[{transform:[{translateY: this.state.animated}]},
                      style.wrapper,
                      {opacity: this.state.opacity}]} 
@@ -102,5 +108,4 @@ export default class ModalSwipeUp extends PureComponent<ModalSwipeUpProps, Modal
         );
     }
 }
-
 
