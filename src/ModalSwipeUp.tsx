@@ -7,9 +7,10 @@ import { Modal, TouchableOpacity, Text, Animated, PanResponder, View } from 'rea
 interface ModalSwipeUpProps {
     showModal: boolean;
     onPressClose?: () => void;
-    closeHeight?: number;
+    closeHeight: number;
     onOpen?: () => void;
     submitButtonOnPress?: () => void;
+    children: React.ReactNode;
 }
 
 interface ModalSwipeUpState {
@@ -95,14 +96,14 @@ export default class ModalSwipeUp extends PureComponent<ModalSwipeUpProps, Modal
 
     render() { 
         return (
-            <Modal visible={this.state.showModal} transparent>
+            <Modal visible={this.state.showModal} transparent >
             <Animated.View style={[{transform:[{translateY: this.state.animated}]},
                      style.wrapper,
                      {opacity: this.state.opacity}]} 
                      {...this.panResponder.panHandlers}>
-                <CustomBody transparent >
+                <View>
                     {this.props.children}
-                </CustomBody>
+                </View>
             </Animated.View >
             </Modal>
         );
