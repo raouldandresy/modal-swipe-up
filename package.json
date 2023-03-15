@@ -15,9 +15,13 @@
     "react-native",
     "animation"
   ],
-    "peerDependencies": {
+  "dependencies": {
+    "react-native-device-info": "10.2.1",
+  },
+  "peerDependencies": {
+    "prop-types": "*",
     "react": "*",
-    "react-native": ">=0.46"
+    "react-native": "*"
   },
  "repository": {
     "type": "git",
