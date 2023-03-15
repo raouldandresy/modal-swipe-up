@@ -1,4 +1,5 @@
 import { Dimensions, StyleSheet, Platform, StatusBar } from 'react-native';
+import DeviceInfo from '../../../node_modules/react-native-device-info';
 
 export const style = StyleSheet.create({
     title:{
@@ -9,7 +10,7 @@ export const style = StyleSheet.create({
     header: { 
         height: 44, 
         alignSelf: 'flex-start', 
-        marginTop: Platform.OS == 'ios' ? StatusBar.currentHeight : 0,
+        marginTop: Platform.OS == 'ios' ? StatusBar.currentHeight + (DeviceInfo.hasDynamicIsland() ? 25 : 0) : 0,
     },
     wrapper: {
         position: 'absolute',
