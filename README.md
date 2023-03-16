@@ -58,11 +58,6 @@ export default App = () => {
 
 <br/>
 
- showModal: boolean;
-    onPressClose?: () => void;
-    closeHeight: number;
-    onOpen?: () => void;
-
 | Properties              | Type       | Description                                                 | Default |
 | ----------------------- | ---------- | ----------------------------------------------------------- | ------- |
 | **showModal**           | `bool`     | Show/Hide the modal                                         | `false` |
