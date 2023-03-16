@@ -1,6 +1,6 @@
 {
   "name": "modal-swipe-up",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Modal Full page with transition from top to bottom and swipe up gesture",
   "main": "index.js",
   "scripts": {
