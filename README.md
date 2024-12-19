@@ -6,8 +6,6 @@
 
 **modal-swipe-up** is a swipeable, easy-to-use Modal for your React Native projects. You can close the modal by swiping up with pan gestures. Feel free to redesign the inside of the Modal.
 
-![Demo](https://github.com/raouldandresy/gif/blob/main/swipe-up-modal.gif)
-
 </div>
 
 <br/>
@@ -86,7 +84,7 @@ export default App;
 
 Here’s a quick demo of how the component works:
 
-![Demo GIF](https://user-images.githubusercontent.com/demo-image.gif)
+![Demo GIF](https://github.com/raouldandresy/gif/blob/main/swipe-up-modal.gif)
 
 ## ⭐️ Show Your Support
 
