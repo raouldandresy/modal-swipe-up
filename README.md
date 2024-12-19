@@ -18,6 +18,8 @@ To install the package:
 npm i modal-swipe-up
 ```
 
+[![npm version](https://badge.fury.io/js/modal-swipe-up.svg)](https://badge.fury.io/js/modal-swipe-up)
+
 ✅ It is done!
 
 ## 🚀 How to use
