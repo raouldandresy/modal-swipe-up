@@ -1,112 +1,158 @@
+/**
+ * ModalSwipeUp Component
+ * 
+ * A swipeable modal component for React Native applications.
+ * Allows users to open, close, and interact with the modal using animations and gestures.
+ * 
+ * Props:
+ * - showModal (boolean): Controls the visibility of the modal.
+ * - onPressClose (function, optional): Callback executed when the modal is closed.
+ * - closeHeight (number): Threshold height for swipe-to-close gesture.
+ * - onOpen (function, optional): Callback executed when the modal opens.
+ * - submitButtonOnPress (function, optional): Callback executed when the submit action is triggered.
+ * - children (React.ReactNode): Content to be displayed inside the modal.
+ */
 
-import React, { Component, Fragment, PureComponent } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { style } from './style';
-import { Modal, TouchableOpacity, Text, Animated, PanResponder, View } from 'react-native';
-
+import { Modal, Animated, PanResponder, View } from 'react-native';
 
 interface ModalSwipeUpProps {
+    /**
+     * Controls the visibility of the modal.
+     */
     showModal: boolean;
+
+    /**
+     * Callback executed when the modal is closed.
+     */
     onPressClose?: () => void;
+
+    /**
+     * Threshold height for swipe-to-close gesture.
+     */
     closeHeight: number;
+
+    /**
+     * Callback executed when the modal opens.
+     */
     onOpen?: () => void;
-    submitButtonOnPress?: () => void;
+
+    /**
+     * Content to be displayed inside the modal.
+     */
     children: React.ReactNode;
 }
 
-interface ModalSwipeUpState {
-    animated: Animated.Value;
-    opacity: Animated.Value;
-    showModal: boolean;
-}
+/**
+ * Functional component for ModalSwipeUp.
+ * 
+ * @param {ModalSwipeUpProps} props - Props for the ModalSwipeUp component.
+ */
+const ModalSwipeUp: React.FC<ModalSwipeUpProps> = ({
+    showModal,
+    onPressClose,
+    closeHeight,
+    onOpen,
+    submitButtonOnPress,
+    children,
+}) => {
+    const [isVisible, setIsVisible] = useState(false);
+    const animatedValue = useRef(new Animated.Value(-1000)).current;
+    const opacityValue = useRef(new Animated.Value(1)).current;
 
-export default class ModalSwipeUp extends PureComponent<ModalSwipeUpProps, ModalSwipeUpState> {
-
-    constructor(props: ModalSwipeUpProps) {
-        super(props);
-        this.state = {
-            animated: new Animated.Value(-1000),
-            opacity: new Animated.Value(1),
-            showModal: false
+    /**
+     * Handles updates to the showModal prop to open or close the modal.
+     */
+    useEffect(() => {
+        if (showModal) {
+            setIsVisible(true);
+            Animated.timing(animatedValue, {
+                duration: 500,
+                toValue: 0,
+                useNativeDriver: true,
+            }).start();
+            onOpen && onOpen();
+        } else if (!showModal && isVisible) {
+            handlePressClose();
         }
-    }
+    }, [showModal]);
 
-    componentDidUpdate(prev: ModalSwipeUpProps){
-        if(!prev.showModal && this.props.showModal){
-            this.setState({showModal: true});
-                Animated.timing(this.state.animated, {
-                    duration: 500,
-                    toValue: 0,
-                    useNativeDriver: true
-                 }).start();
-            this.props.onOpen && this.props.onOpen();
-        }
-        if(prev.showModal && !this.props.showModal){
-            this.onPressClose();
-        }
-    }
-    
-    onPress=() => {
-        this.setState({animated: new Animated.Value(-1000), opacity: new Animated.Value(1), showModal: false});
-        this.props.submitButtonOnPress && this.props.submitButtonOnPress();
-    }
+    /**
+     * Handles the submit button press action and resets modal state.
+     */
+    const handlePress = () => {
+        animatedValue.setValue(-1000);
+        opacityValue.setValue(1);
+        setIsVisible(false);
+        submitButtonOnPress && submitButtonOnPress();
+    };
 
-    panResponder = PanResponder.create({
-        onStartShouldSetPanResponder: (evt, gestureState) => {
-            return true
-        },
+    /**
+     * Handles the close action with animation.
+     */
+    const handlePressClose = () => {
+        Animated.timing(animatedValue, {
+            duration: 500,
+            toValue: -1000,
+            useNativeDriver: true,
+        }).start(() => closeModal());
+    };
 
+    /**
+     * Closes the modal and resets animation values.
+     */
+    const closeModal = () => {
+        animatedValue.setValue(-1000);
+        opacityValue.setValue(1);
+        setIsVisible(false);
+        onPressClose && onPressClose();
+    };
+
+    /**
+     * PanResponder to handle swipe gestures for the modal.
+     */
+    const panResponder = PanResponder.create({
+        onStartShouldSetPanResponder: () => true,
         onPanResponderMove: (e, gestureState) => {
             const { dy } = gestureState;
-            if(this.props.closeHeight && dy < 0){
-                this.state.animated.setValue(dy);
-                let opacity = this.props.closeHeight ? this.props.closeHeight/dy : -1;
-                this.state.opacity.setValue(-opacity);
+            if (closeHeight && dy < 0) {
+                animatedValue.setValue(dy);
+                const opacity = closeHeight ? closeHeight / dy : -1;
+                opacityValue.setValue(-opacity);
             }
         },
-
         onPanResponderRelease: (e, gestureState) => {
             const { dy } = gestureState;
-            if(this.props.closeHeight){
-                if(dy < -this.props.closeHeight) { // Swipe up away
-                   this.onPressClose();
-                } else {  
-                    this.setState({opacity: new Animated.Value(1)})
-                    Animated.timing(this.state.animated, {
+            if (closeHeight) {
+                if (dy < -closeHeight) {
+                    handlePressClose();
+                } else {
+                    opacityValue.setValue(1);
+                    Animated.timing(animatedValue, {
                         toValue: 0,
                         duration: 150,
-                        useNativeDriver: true
+                        useNativeDriver: true,
                     }).start();
                 }
             }
-        }
-    })
+        },
+    });
 
-    onPressClose = () => {
-        Animated.timing(this.state.animated, {
-            duration: 500,
-            toValue: -1000,
-            useNativeDriver: true
-         }).start(this.close);
-    }
+    return (
+        <Modal visible={isVisible} transparent>
+            <Animated.View
+                style={[
+                    { transform: [{ translateY: animatedValue }] },
+                    style.wrapper,
+                    { opacity: opacityValue },
+                ]}
+                {...panResponder.panHandlers}
+            >
+                <View>{children}</View>
+            </Animated.View>
+        </Modal>
+    );
+};
 
-    close = () => {
-        this.setState({animated: new Animated.Value(-1000), opacity: new Animated.Value(1), showModal: false})
-        this.props.onPressClose && this.props.onPressClose();
-    }
-
-    render() { 
-        return (
-            <Modal visible={this.state.showModal} transparent >
-            <Animated.View style={[{transform:[{translateY: this.state.animated}]},
-                     style.wrapper,
-                     {opacity: this.state.opacity}]} 
-                     {...this.panResponder.panHandlers}>
-                <View>
-                    {this.props.children}
-                </View>
-            </Animated.View >
-            </Modal>
-        );
-    }
-}
-
+export default ModalSwipeUp;

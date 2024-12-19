@@ -2,25 +2,29 @@ import * as React from 'react';
 
 declare interface ModalSwipeUpProps extends React.Props<ModalSwipeUp> {
   /**
-   * Required prop for modal actual state. Set true if you want to open modal
-   */
-   showModal: boolean;
-  
-   /**
-   * Required prop to keep panel's state sync with your parent components'state. Will be fired when modal is closed. See the example project.
+     * Controls the visibility of the modal.
+     */
+  showModal: boolean;
+
+  /**
+   * Callback executed when the modal is closed.
    */
   onPressClose?: () => void;
 
   /**
-   * Set minimum height for swipe up and close modal
+   * Threshold height for swipe-to-close gesture.
    */
   closeHeight: number;
 
   /**
-   * Fired when the modal is opened
+   * Callback executed when the modal opens.
    */
-   onOpen?: () => void;
+  onOpen?: () => void;
 
+  /**
+   * Content to be displayed inside the modal.
+   */
+  children: React.ReactNode;
 }
 
 declare class ModalSwipeUp extends React.Component<

@@ -1,4 +1,4 @@
-import { Dimensions, StyleSheet, Platform, StatusBar } from 'react-native';
+import { StyleSheet, Platform, StatusBar } from 'react-native';
 
 export const style = StyleSheet.create({
     title:{
