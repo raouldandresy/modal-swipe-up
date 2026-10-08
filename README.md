@@ -20,11 +20,17 @@ npm i modal-swipe-up
 
 [![npm version](https://badge.fury.io/js/modal-swipe-up.svg)](https://badge.fury.io/js/modal-swipe-up)
 
-Peer dependencies (follow their install guides, including the Babel/worklets setup if you are not on Expo):
+Peer dependencies:
 
 ```bash
+# Expo (picks the versions matching your SDK)
+npx expo install react-native-reanimated react-native-worklets react-native-gesture-handler
+
+# Bare React Native (follow their install guides for the Babel/worklets setup)
 npm i react-native-reanimated react-native-worklets react-native-gesture-handler
 ```
+
+Works with Expo Go and with development builds. Reanimated 4 requires the New Architecture (the default on current Expo SDKs).
 
 ✅ It is done!
 
@@ -117,7 +123,7 @@ const Home = () => {
 
 ### Other things to know
 
-- Gestures need `react-native-gesture-handler`, `react-native-reanimated` and `react-native-worklets`. They are native modules, so rebuild the app after installing them (Expo Go is not enough).
+- Gestures need `react-native-gesture-handler`, `react-native-reanimated` and `react-native-worklets`. They are native modules: in a bare or development-build app, rebuild after installing them (Expo Go already includes them).
 - The swipe starts after a short upward drag. Taps and buttons inside the modal still work, but an upward drag inside a vertical `ScrollView` will close the modal.
 - The Android back button closes the modal.
 
