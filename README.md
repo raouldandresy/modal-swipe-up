@@ -79,8 +79,9 @@ export default App;
 | ----------------------- | ---------- | ----------------------------------------------------------- | ------- |
 | **showModal**           | `bool`     | Show/Hide the modal                                         | `false` |
 | **onPressClose**        | `Function` | Fired when the modal is closed                              |         |
-| **closeHeight**         | `number`   | Set minimum height for swipe up and close modal             |         |
+| **closeHeight**         | `number`   | Swipe distance (px) after which the modal closes            | `150`   |
 | **onOpen**              | `Function` | Fired when the modal is opened                              |         |
+| **style**               | `ViewStyle` | Style of the modal container (e.g. `backgroundColor`)      | white background |
 
 ## 🖼️ Demo
 

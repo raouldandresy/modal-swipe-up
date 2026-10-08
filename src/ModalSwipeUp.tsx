@@ -1,23 +1,16 @@
-/**
- * ModalSwipeUp Component
- * 
- * A swipeable modal component for React Native applications.
- * Allows users to open, close, and interact with the modal using animations and gestures.
- * 
- * Props:
- * - showModal (boolean): Controls the visibility of the modal.
- * - onPressClose (function, optional): Callback executed when the modal is closed.
- * - closeHeight (number): Threshold height for swipe-to-close gesture.
- * - onOpen (function, optional): Callback executed when the modal opens.
- * - submitButtonOnPress (function, optional): Callback executed when the submit action is triggered.
- * - children (React.ReactNode): Content to be displayed inside the modal.
- */
-
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+    Animated,
+    Modal,
+    PanResponder,
+    StyleProp,
+    View,
+    ViewStyle,
+    useWindowDimensions,
+} from 'react-native';
 import { style } from './style';
-import { Modal, Animated, PanResponder, View } from 'react-native';
 
-interface ModalSwipeUpProps {
+export interface ModalSwipeUpProps {
     /**
      * Controls the visibility of the modal.
      */
@@ -29,9 +22,9 @@ interface ModalSwipeUpProps {
     onPressClose?: () => void;
 
     /**
-     * Threshold height for swipe-to-close gesture.
+     * Swipe distance (in px) after which the modal closes. Defaults to 150.
      */
-    closeHeight: number;
+    closeHeight?: number;
 
     /**
      * Callback executed when the modal opens.
@@ -39,113 +32,122 @@ interface ModalSwipeUpProps {
     onOpen?: () => void;
 
     /**
+     * Style applied to the modal container (e.g. backgroundColor, padding).
+     */
+    style?: StyleProp<ViewStyle>;
+
+    /**
      * Content to be displayed inside the modal.
      */
     children: React.ReactNode;
 }
 
+const OPEN_DURATION = 500;
+const CLOSE_DURATION = 500;
+const SNAP_BACK_DURATION = 150;
+const DEFAULT_CLOSE_HEIGHT = 150;
+// Vertical movement (px) needed before the modal claims the gesture, so taps
+// and scrolling inside the children keep working.
+const GESTURE_ACTIVATION = 8;
+
 /**
- * Functional component for ModalSwipeUp.
- * 
- * @param {ModalSwipeUpProps} props - Props for the ModalSwipeUp component.
+ * Full page modal that slides in from the top and closes with a swipe up.
  */
 const ModalSwipeUp: React.FC<ModalSwipeUpProps> = ({
     showModal,
     onPressClose,
-    closeHeight,
+    closeHeight = DEFAULT_CLOSE_HEIGHT,
     onOpen,
-    submitButtonOnPress,
+    style: containerStyle,
     children,
 }) => {
+    const { height: windowHeight } = useWindowDimensions();
     const [isVisible, setIsVisible] = useState(false);
-    const animatedValue = useRef(new Animated.Value(-1000)).current;
-    const opacityValue = useRef(new Animated.Value(1)).current;
+    const translateY = useRef(new Animated.Value(-windowHeight)).current;
 
-    /**
-     * Handles updates to the showModal prop to open or close the modal.
-     */
+    // Latest values for the long-lived PanResponder and effect.
+    const latest = useRef({ windowHeight, closeHeight, onPressClose, onOpen });
+    latest.current = { windowHeight, closeHeight, onPressClose, onOpen };
+
+    const close = useCallback(() => {
+        Animated.timing(translateY, {
+            duration: CLOSE_DURATION,
+            toValue: -latest.current.windowHeight,
+            useNativeDriver: true,
+        }).start(({ finished }) => {
+            if (!finished) return;
+            setIsVisible(false);
+            latest.current.onPressClose?.();
+        });
+    }, [translateY]);
+
     useEffect(() => {
         if (showModal) {
+            translateY.setValue(-latest.current.windowHeight);
             setIsVisible(true);
-            Animated.timing(animatedValue, {
-                duration: 500,
+            Animated.timing(translateY, {
+                duration: OPEN_DURATION,
                 toValue: 0,
                 useNativeDriver: true,
             }).start();
-            onOpen && onOpen();
-        } else if (!showModal && isVisible) {
-            handlePressClose();
+            latest.current.onOpen?.();
+        } else if (isVisible) {
+            close();
         }
+        // Only react to showModal changes; isVisible is read without re-triggering.
     }, [showModal]);
 
-    /**
-     * Handles the submit button press action and resets modal state.
-     */
-    const handlePress = () => {
-        animatedValue.setValue(-1000);
-        opacityValue.setValue(1);
-        setIsVisible(false);
-        submitButtonOnPress && submitButtonOnPress();
-    };
+    useEffect(() => () => translateY.stopAnimation(), [translateY]);
 
-    /**
-     * Handles the close action with animation.
-     */
-    const handlePressClose = () => {
-        Animated.timing(animatedValue, {
-            duration: 500,
-            toValue: -1000,
-            useNativeDriver: true,
-        }).start(() => closeModal());
-    };
-
-    /**
-     * Closes the modal and resets animation values.
-     */
-    const closeModal = () => {
-        animatedValue.setValue(-1000);
-        opacityValue.setValue(1);
-        setIsVisible(false);
-        onPressClose && onPressClose();
-    };
-
-    /**
-     * PanResponder to handle swipe gestures for the modal.
-     */
-    const panResponder = PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onPanResponderMove: (e, gestureState) => {
-            const { dy } = gestureState;
-            if (closeHeight && dy < 0) {
-                animatedValue.setValue(dy);
-                const opacity = closeHeight ? closeHeight / dy : -1;
-                opacityValue.setValue(-opacity);
-            }
-        },
-        onPanResponderRelease: (e, gestureState) => {
-            const { dy } = gestureState;
-            if (closeHeight) {
-                if (dy < -closeHeight) {
-                    handlePressClose();
-                } else {
-                    opacityValue.setValue(1);
-                    Animated.timing(animatedValue, {
+    const panResponder = useMemo(
+        () =>
+            PanResponder.create({
+                onMoveShouldSetPanResponder: (_e, { dx, dy }) =>
+                    dy < -GESTURE_ACTIVATION && Math.abs(dy) > Math.abs(dx),
+                onPanResponderMove: (_e, { dy }) => {
+                    if (dy < 0) translateY.setValue(dy);
+                },
+                onPanResponderRelease: (_e, { dy }) => {
+                    if (dy < -latest.current.closeHeight) {
+                        close();
+                    } else {
+                        Animated.timing(translateY, {
+                            toValue: 0,
+                            duration: SNAP_BACK_DURATION,
+                            useNativeDriver: true,
+                        }).start();
+                    }
+                },
+                onPanResponderTerminate: () => {
+                    Animated.timing(translateY, {
                         toValue: 0,
-                        duration: 150,
+                        duration: SNAP_BACK_DURATION,
                         useNativeDriver: true,
                     }).start();
-                }
-            }
-        },
+                },
+            }),
+        [close, translateY],
+    );
+
+    // Fades out while swiping up; reaches 0 at the close threshold.
+    const opacity = translateY.interpolate({
+        inputRange: [-closeHeight, 0],
+        outputRange: [0, 1],
+        extrapolate: 'clamp',
     });
 
     return (
-        <Modal visible={isVisible} transparent>
+        <Modal
+            visible={isVisible}
+            transparent
+            animationType="none"
+            onRequestClose={close}
+        >
             <Animated.View
                 style={[
-                    { transform: [{ translateY: animatedValue }] },
                     style.wrapper,
-                    { opacity: opacityValue },
+                    containerStyle,
+                    { opacity, transform: [{ translateY }] },
                 ]}
                 {...panResponder.panHandlers}
             >

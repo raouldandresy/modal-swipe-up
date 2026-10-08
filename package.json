@@ -2,31 +2,67 @@
   "name": "modal-swipe-up",
   "version": "2.0.0",
   "description": "Modal Full page with transition from top to bottom and swipe up gesture",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Giuseppe Corbisiero",
   "license": "MIT",
-    "keywords": [
+  "author": "Giuseppe Corbisiero",
+  "main": "lib/commonjs/index.js",
+  "module": "lib/module/index.js",
+  "types": "lib/typescript/index.d.ts",
+  "react-native": "src/index.ts",
+  "files": [
+    "src",
+    "lib",
+    "LICENSE",
+    "README.md",
+    "SECURITY.md"
+  ],
+  "sideEffects": false,
+  "keywords": [
     "modal",
     "swipe-up",
     "react",
     "react-native",
     "animation"
   ],
-  "peerDependencies": {
-    "prop-types": "*",
-    "react": "*",
-    "react-native": "*"
-  },
- "repository": {
+  "repository": {
     "type": "git",
     "url": "git+https://github.com/raouldandresy/modal-swipe-up.git"
   },
   "bugs": {
     "url": "https://github.com/raouldandresy/modal-swipe-up/issues"
   },
-  "homepage": "https://github.com/raouldandresy/modal-swipe-up/blob/main/README.md"
-
+  "homepage": "https://github.com/raouldandresy/modal-swipe-up#readme",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "bob build",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "prepare": "bob build",
+    "release": "release-it"
+  },
+  "react-native-builder-bob": {
+    "source": "src",
+    "output": "lib",
+    "targets": [
+      "commonjs",
+      "module",
+      "typescript"
+    ]
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.73"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/react": "19.2.3",
+    "eslint": "^10.11.0",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "react-native-builder-bob": "^0.40.12",
+    "release-it": "^20.2.1",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.71.0"
+  }
 }

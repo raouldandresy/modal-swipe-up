@@ -1,0 +1,11 @@
+node_modules/
+lib/
+dist/
+*.tsbuildinfo
+.expo/
+.env
+.env.*
+npm-debug.log*
+yarn-debug.log*
+.DS_Store
+Thumbs.db
