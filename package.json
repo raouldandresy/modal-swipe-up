@@ -67,7 +67,7 @@
     "react-native-gesture-handler": "~2.32.0",
     "react-native-reanimated": "^4.5.1",
     "react-native-worklets": "^0.10.1",
-    "release-it": "^20.2.1",
+    "release-it": "^21.1.0",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.71.0"
   },
