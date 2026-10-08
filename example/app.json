@@ -1,0 +1,8 @@
+{
+  "expo": {
+    "name": "Modal Swipe Up Example",
+    "slug": "modal-swipe-up-example",
+    "ios": { "bundleIdentifier": "com.example.modalswipeup" },
+    "android": { "package": "com.example.modalswipeup" }
+  }
+}

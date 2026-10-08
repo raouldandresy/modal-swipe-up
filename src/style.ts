@@ -8,7 +8,5 @@ export const style = StyleSheet.create({
         right: 0,
         bottom: 0,
         backgroundColor: '#FFFFFF',
-        elevation: 10,
-        zIndex: 10,
     },
 });

@@ -20,6 +20,12 @@ npm i modal-swipe-up
 
 [![npm version](https://badge.fury.io/js/modal-swipe-up.svg)](https://badge.fury.io/js/modal-swipe-up)
 
+Peer dependencies (follow their install guides, including the Babel/worklets setup if you are not on Expo):
+
+```bash
+npm i react-native-reanimated react-native-worklets react-native-gesture-handler
+```
+
 ✅ It is done!
 
 ## 🚀 How to use
@@ -28,7 +34,7 @@ npm i modal-swipe-up
 import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import ModalSwipeUp from 'modal-swipe-up';
+import { ModalSwipeUp } from 'modal-swipe-up';
 
 const App = () => {
   const [isModalActive, setIsModalActive] = useState(false);
@@ -82,6 +88,48 @@ export default App;
 | **closeHeight**         | `number`   | Swipe distance (px) after which the modal closes            | `150`   |
 | **onOpen**              | `Function` | Fired when the modal is opened                              |         |
 | **style**               | `ViewStyle` | Style of the modal container (e.g. `backgroundColor`)      | white background |
+
+## 📝 Notes
+
+### Safe area inside the modal (avoid flickering)
+
+Do **not** use `SafeAreaView` inside the modal content. It recalculates its padding from its position on screen, so while the panel moves (especially on a slow swipe, on Android) the content flickers.
+
+Read the insets once, from outside the modal, and apply them as plain padding:
+
+```javascript
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
+
+// Wrap your app once:
+// <SafeAreaProvider><Home /></SafeAreaProvider>
+
+const Home = () => {
+  const insets = useSafeAreaInsets();
+  return (
+    <ModalSwipeUp showModal={visible} onPressClose={close} closeHeight={150}>
+      <View style={{ paddingTop: insets.top + 24 }}>
+        <Text>Your Content Here</Text>
+      </View>
+    </ModalSwipeUp>
+  );
+};
+```
+
+### Other things to know
+
+- Gestures need `react-native-gesture-handler`, `react-native-reanimated` and `react-native-worklets`. They are native modules, so rebuild the app after installing them (Expo Go is not enough).
+- The swipe starts after a short upward drag. Taps and buttons inside the modal still work, but an upward drag inside a vertical `ScrollView` will close the modal.
+- The Android back button closes the modal.
+
+## 🧪 Example app
+
+A runnable Expo app is in [`example/`](./example):
+
+```bash
+cd example
+npm install
+npx expo run:ios # or run:android
+```
 
 ## 🖼️ Demo
 
